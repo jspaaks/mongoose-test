@@ -48,17 +48,17 @@ app.get('/id/:id/instances', function (req, res) {
     res.send(str);
 });
 
-app.get('/id/:id', function (req, res, next) {
-    Instance.find({
-            name: new RegExp("^.")
-        }, function(err, found) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.json(found);
-        }
-    });
-});
+// app.get('/id/:id', function (req, res, next) {
+//     Instance.find({
+//             name: new RegExp("^.")
+//         }, function(err, found) {
+//         if (err) {
+//             res.send(err);
+//         } else {
+//             res.json(found);
+//         }
+//     });
+// });
 
 
 
