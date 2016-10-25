@@ -21,3 +21,73 @@ trying out express, mongdb, and mongoose
 - in the browser, go to one of the routes that are defined in server.js, such as ``http://localhost:3000/id/13/children``, the server should respond with a text like 'getting children of node with id: 2...'
 
 
+
+---
+```
+# import data from file, put it in a collection named 'dbptypes'
+# overwrite any existing collection by that name
+# put the collection in a database named 'test'
+mongoimport --db test --collection dbptypes --drop --file data/en.dbpTypes.darkTypes.bank.tsv.words.json
+
+mongoimport --db test --collection dbptypes --type json --drop --file data/en.dbpTypes.darkTypes.bank.tsv.words.json
+
+
+# start the mongodb shell
+mongo
+
+# in the shell, check that you can access the data
+db.dbptypes.find({"children": {"$exists": true}})
+```
+
+
+
+
+```
+
+db.dbptypes.aggregate({
+    $match: {"children": {$exists: true}}
+}, {
+    $project: {
+        mention_count: '$children.mention_count',
+        name: '$children.name',
+        url: '$children.url'
+    }
+})
+
+
+db.dbptypes.aggregate({
+    $match: {"children": {$exists: true}}
+}, {
+    $unwind: "$children"
+})
+
+
+db.parents.aggregate({
+    $match: {'children.age': {$gte: 18}}
+}, {
+    $unwind: '$children'
+}, {
+    $match: {'children.age': {$gte: 18}}
+}, {
+    $project: {
+        name: '$children.name',
+        age:'$children.age'
+    }
+})
+{
+    "result" : [
+        {
+            "_id" : ObjectId("51a7bf04dacca8ba98434eb5"),
+            "name" : "Margaret",
+            "age" : 20
+        },
+        {
+            "_id" : ObjectId("51a7bf04dacca8ba98434eb6"),
+            "name" : "John",
+            "age" : 22
+        }
+    ],
+    "ok" : 1
+}
+
+```
