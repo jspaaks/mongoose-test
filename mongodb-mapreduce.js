@@ -58,16 +58,17 @@ function drilldown(doc, path) {
         pathstr += "/";
     });
 
-    print(pathstr);
+    print("entity:   " + pathstr);
     //var newid = ObjectId();
     if (haschildren(doc)) {
-//        drilldown(doc.children[0], path);
         doc.children.forEach((child) => {
             drilldown(child, path);
         });
-    } else {
-  //      print("No more child entities.");
-//        print(Object.getOwnPropertyNames(doc));
+    };
+    if (hasinstances(doc)) {
+        doc.instances.forEach((instance) => {
+            print("instance: " + instance.name + " of entity " + path[path.length - 1]);
+        });
     }
 }
 
