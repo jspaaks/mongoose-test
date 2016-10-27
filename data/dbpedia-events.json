@@ -1,0 +1,46 @@
+{
+    "children": [{
+        "children": [{
+            "instance_count": 2,
+            "instances": [{
+                "mention_count": 13,
+                "name": "Vietnam_War",
+                "url": "http://dbpedia.org/resource/Vietnam_War"
+            }, {
+                "mention_count": 4,
+                "name": "World_War_II",
+                "url": "http://dbpedia.org/resource/World_War_II"
+            }],
+            "mention_count": 17,
+            "name": "MilitaryConflict",
+            "type": "entity",
+            "url": "http://dbpedia.org/ontology/MilitaryConflict"
+        }, {
+            "instance_count": 1,
+            "instances": [{
+                "mention_count": 4,
+                "name": "The_Open_Championship",
+                "url": "http://dbpedia.org/resource/The_Open_Championship"
+            }],
+            "mention_count": 4,
+            "name": "SportsEvent",
+            "type": "entity",
+            "url": "http://dbpedia.org/ontology/SportsEvent"
+        }],
+        "instance_count": 1,
+        "instances": [{
+            "mention_count": 20,
+            "name": "War_of_the_Regulation",
+            "url": "http://dbpedia.org/resource/War_of_the_Regulation"
+        }],
+        "mention_count": 41,
+        "name": "SocietalEvent",
+        "type": "entity",
+        "url": "http://dbpedia.org/ontology/SocietalEvent"
+    }],
+    "instance_count": 0,
+    "mention_count": 41,
+    "name": "Event",
+    "type": "entity",
+    "url": "http://dbpedia.org/ontology/Event"
+}
