@@ -48,18 +48,23 @@ function hasinstances(doc) {
     return doc.instance_count > 0;
 }
 
+function emit(key, value) {
+    print("will emit ");
+    print("key: " + key + "  value: " + tojson(value));
+}
+
 
 function drilldown(doc, path) {
 
-    path = path.concat([doc.name]);
+    path = path.concat([{id:doc._id || ObjectId(), name:doc.name}]);
+
     var pathstr = "";
-    path.forEach((id) => {
-        pathstr += id.valueOf();
+    path.forEach((p) => {
+        pathstr += p.name.valueOf();
         pathstr += "/";
     });
-
     print("entity:   " + pathstr);
-    //var newid = ObjectId();
+
     if (haschildren(doc)) {
         doc.children.forEach((child) => {
             drilldown(child, path);
@@ -67,7 +72,17 @@ function drilldown(doc, path) {
     };
     if (hasinstances(doc)) {
         doc.instances.forEach((instance) => {
-            print("instance: " + instance.name + " of entity " + path[path.length - 1]);
+            print("instance: " + instance.name + " of entity " + path[path.length - 1].name);
+            var value = {
+                mention_count: instance.mention_count,
+                name: instance.name,
+                url: instance.url,
+                pathstr: pathstr,
+                path: path,
+                instanceOf: path[path.length - 1].id.valueOf()
+            };
+            var key = ObjectId();
+            emit(key, value);
         });
     }
 }
@@ -75,7 +90,6 @@ function drilldown(doc, path) {
 
 var doc = db.events.findOne({});
 path = [];
-//path.push(doc._id);
 
 drilldown(doc, path);
 
