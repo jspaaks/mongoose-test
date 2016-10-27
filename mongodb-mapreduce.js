@@ -2,96 +2,96 @@
 // // in the terminal, start mongo shell by ``mongo``
 // // use test database
 // // use events collection
-// var mapfun = function() {
-//     if (this.hasOwnProperty("type")) {
-//         var entity = {
-//             "type": "entity",
-//             "name": this.name,
-//             "parent": this._id
-//         }
-//         emit(new ObjectId(), entity);
-//     } else {
-//         //
-//     }
-// };
 //
-// var reducefun = function(key, value) {
-//     return value;
-// };
-//
-// var outstr = {out: "map_reduce_example"};
-//
-// db.events.mapReduce(mapfun, reducefun, outstr);
-//
-// db.map_reduce_example.find({});
-//
-// //
-// // // this next stuff is for troubleshooting the map function
-// //
-// // var rootDoc = db.events.findOne({});
-// //
-// // var emit = function(key, value) {
-// //     print("emit");
-// //     print("key: " + key + "  value: " + tojson(value));
-// // }
-// //
-// // mapfun.apply(rootDoc)
 
+function mapfun() {
 
-function haschildren(doc) {
-    return doc.hasOwnProperty("children") &&
-        doc.children instanceof Array &&
-        doc.children.length > 0;
-}
-
-function hasinstances(doc) {
-    return doc.instance_count > 0;
-}
-
-function emit(key, value) {
-    print("will emit ");
-    print("key: " + key + "  value: " + tojson(value));
-}
-
-
-function drilldown(doc, path) {
-
-    path = path.concat([{id:doc._id || ObjectId(), name:doc.name}]);
-
-    var pathstr = "";
-    path.forEach((p) => {
-        pathstr += p.name.valueOf();
-        pathstr += "/";
-    });
-    print("entity:   " + pathstr);
-
-    if (haschildren(doc)) {
-        doc.children.forEach((child) => {
-            drilldown(child, path);
-        });
-    };
-    if (hasinstances(doc)) {
-        doc.instances.forEach((instance) => {
-            print("instance: " + instance.name + " of entity " + path[path.length - 1].name);
-            var value = {
-                mention_count: instance.mention_count,
-                name: instance.name,
-                url: instance.url,
-                pathstr: pathstr,
-                path: path,
-                instanceOf: path[path.length - 1].id.valueOf()
-            };
-            var key = ObjectId();
-            emit(key, value);
-        });
+    function haschildren(doc) {
+        return doc.hasOwnProperty("children") &&
+            doc.children instanceof Array &&
+            doc.children.length > 0;
     }
-}
 
+    function hasinstances(doc) {
+        return doc.instance_count > 0;
+    }
 
-var doc = db.events.findOne({});
-path = [];
+    // function emit(key, value) {
+    //     print("would emit ");
+    //     print("key: " + key + "  value: " + tojson(value));
+    // }
 
-drilldown(doc, path);
+    function pathtostr(path) {
+        var pathstr = "";
+        path.forEach((p) => {
+            pathstr += p.name;
+            pathstr += "/";
+        });
+        return pathstr;
+    }
+
+    function drilldown(doc, path) {
+
+        if (typeof path === "undefined" || (path instanceof Array && path.length === 0)) {
+            path = [{
+                id: ObjectId(),
+                name: ""
+            }];
+        }
+
+        var value = {
+            childOf: path[path.length - 1].id.valueOf(),
+            instance_count: doc.instance_count,
+            isentity: true,
+            isinstance: false,
+            mention_count: doc.mention_count,
+            name: doc.name,
+            path: path,
+            pathstr: pathtostr(path),
+            type: doc.type,
+            url: doc.url
+        };
+        var key = ObjectId();
+        emit(key, value);
+
+        path = path.concat([{id:doc._id || ObjectId(), name:doc.name}]);
+
+        if (haschildren(doc)) {
+            doc.children.forEach((child) => {
+                drilldown(child, path);
+            });
+        };
+        if (hasinstances(doc)) {
+            doc.instances.forEach((instance) => {
+                print("instance: " + instance.name + " of entity " + path[path.length - 1].name);
+                var value = {
+                    instanceOf: path[path.length - 1].id.valueOf(),
+                    isentity: false,
+                    isinstance: true,
+                    mention_count: instance.mention_count,
+                    name: instance.name,
+                    path: path,
+                    pathstr: pathtostr(path),
+                    url: instance.url
+                };
+                var key = ObjectId();
+                emit(key, value);
+            });
+        }
+    }
+
+    var doc = this;
+    drilldown(doc);
+};
+
+function reducefun(key, value) {
+    return value;
+};
+
+var outstr = {out: "nodes"};
+
+db.events.mapReduce(mapfun, reducefun, outstr);
+
 
 
 

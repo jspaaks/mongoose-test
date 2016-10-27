@@ -1,6 +1,5 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var Instance = require('./models/instance');
 
 // Use native Node promises
 mongoose.Promise = global.Promise;
@@ -10,6 +9,25 @@ mongoose.connect('mongodb://localhost/test')
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
+
+mongoose.connection.on('error', function() {
+    console.error.bind(console, "connection error:");
+});
+
+mongoose.connection.once('open', function() {
+    console.log("Connected");
+});
+
+var errhandler = (err) => {
+    console.error("Something went wrong ", err);
+};
+
+var cb = (resolved) => {
+    console.log(resolved);
+    return resolved;
+};
+
+var nodes = mongoose.connection.db.collection('nodes');
 
 
 
@@ -48,17 +66,16 @@ app.get('/id/:id/instances', function (req, res) {
     res.send(str);
 });
 
-// app.get('/id/:id', function (req, res, next) {
-//     Instance.find({
-//             name: new RegExp("^.")
-//         }, function(err, found) {
-//         if (err) {
-//             res.send(err);
-//         } else {
-//             res.json(found);
-//         }
-//     });
-// });
+app.get('/test', function (req, res, next) {
+    nodes.findOne({}, function(err, found) {
+        if (err) {
+            res.send(err);
+        } else {
+            console.log(found);
+            res.json(found);
+        }
+    });
+});
 
 
 
