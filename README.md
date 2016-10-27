@@ -91,3 +91,17 @@ db.parents.aggregate({
 }
 
 ```
+
+mongoimport --db test --collection events --type json --drop --file data/dbpedia-events.json
+
+
+
+// // Drop the 'foo' collection from the current database
+// mongoose.connection.db.dropCollection('foo', function(err, result) {...});
+//
+// // Drop the current database
+// mongoose.connection.db.dropDatabase(function(err, result) {...});
+//
+
+
+
